@@ -11,7 +11,9 @@ import {
   editUser,
   deleteUser,
   userDeatilsonScan
+  
 } from "../controllers/userControllers.js";
+import { addCredits } from "../controllers/userControllers.js";
 import { verifyUserToken } from "../middleware/auth.js";
 import adminTokenCheck from "../middleware/adminTokenCheck.js";
 
@@ -24,6 +26,7 @@ router.delete('/delete/:id',deleteUser)
 router.get("/getAll", adminTokenCheck, fetchUsers);
 router.get("/", verifyUserToken, fetchUser);
 router.get("/:id", adminTokenCheck, fetchUserById);
+router.put("/addcredits",adminTokenCheck, addCredits)
 
 router.post("/order/create", createOrder);
 router.post("/order/verify", paymentVerification);

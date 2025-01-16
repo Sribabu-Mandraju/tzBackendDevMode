@@ -10,6 +10,7 @@ import QRCode from 'qrcode'
 import NodeCache from "node-cache";
 const userCache = new NodeCache({ stdTTL: 3600 });
 import axios from "axios"; // Cache users for 1 hour
+import { updateUserCredits } from "../helpers/credits.helpers.js";
 
 
 export const loginUser = async (req, res) => {
@@ -292,6 +293,7 @@ export const createOrder = async (req, res) => {
   res.status(200).send({ order, status: "success" });
 };
 
+
 export const paymentVerification = async (req, res) => {
   const {
     razorpay_payment_id,
@@ -301,22 +303,36 @@ export const paymentVerification = async (req, res) => {
     userData,
   } = req.body;
 
-  const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET_KEY);
-  hmac.update(order_id + "|" + razorpay_payment_id);
-  const generated_signature = hmac.digest("hex");
+  try {
+    // Generate HMAC for signature verification
+    const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET_KEY);
+    hmac.update(order_id + "|" + razorpay_payment_id);
+    const generated_signature = hmac.digest("hex");
 
-  const isAuth = generated_signature === razorpay_signature;
-  if (isAuth) {
+    const isAuth = generated_signature === razorpay_signature;
+
+    if (!isAuth) {
+      return res.status(400).json({
+        message: "Payment Failed Due to Signature not matched",
+        success: false,
+      });
+    }
+
+    // Check if the user already exists
     const existingUser = await User.findOne({ email: userData.email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Validate user mode
     if (!userData.mode) {
       return res.status(400).json({ error: "Mode Error" });
     }
 
+    // Hash the email for subscription
     const sub = await bcrypt.hash(userData.email, 12);
+
+    // Create new user in the database
     const user = await User.create({
       email: userData.email,
       firstName: userData.firstName,
@@ -339,33 +355,39 @@ export const paymentVerification = async (req, res) => {
       mode: userData.mode,
     });
 
-    // Generate the URL based on user _id
-    const qrUrl = `https://teckzite.vercel.app/user/user-info/${user._id}`;
-
-    // Generate QR code image
-    const qrCodeImage = await QRCode.toDataURL(qrUrl);
-
-    // Save the QR code image to the database along with other user information
-    user.qrimage = qrCodeImage; // Assuming you have a field named qrCodeImage in your User schema
-    await user.save();
-
-    await SignUser.findOneAndDelete({ email: userData.email });
-
     if (!user) {
       return res.status(400).json({ message: "User not registered" });
     }
 
+    // Generate QR Code and save it to the user document
+    const qrUrl = `https://teckzite.vercel.app/user/user-info/${user._id}`;
+    const qrCodeImage = await QRCode.toDataURL(qrUrl);
+    user.qrimage = qrCodeImage;
+    await user.save();
+
+    // Remove from SignUser collection if exists
+    await SignUser.findOneAndDelete({ email: userData.email });
+
+    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
+    // Handle referral logic
     if (userData.referredBy && userData.referredBy.length === 9) {
       const ref = await User.findOneAndUpdate(
         { tzkid: userData.referredBy.toLowerCase() },
         { $push: { refreals: user.tzkid } }
       );
 
-      if (!ref) {
+      if (ref) {
+        try {
+          // Add credits to the referring user's account
+          await updateUserCredits(userData.referredBy.toLowerCase(), 50);
+        } catch (creditError) {
+          console.error("Error adding credits to referrer:", creditError.message);
+        }
+      } else {
         return res.status(200).json({
           token,
           user,
@@ -375,17 +397,25 @@ export const paymentVerification = async (req, res) => {
       }
     }
 
-    // Send email
+    // Send email notification
     await sendemail(user);
 
+    // Clear user cache
     userCache.del("users");
-    return res
-      .status(200)
-      .json({ success: true, token, user, message: "Registration SuccessFull" });
-  } else {
-    return res.status(400).json({
-      message: "Payment Failed Due to Signature not matched",
+
+    // Return successful response
+    return res.status(200).json({
+      success: true,
+      token,
+      user,
+      message: "Registration Successful",
+    });
+  } catch (error) {
+    console.error("Error in payment verification:", error.message);
+    return res.status(500).json({
+      message: "Internal Server Error",
       success: false,
+      error: error.message,
     });
   }
 };
@@ -580,3 +610,35 @@ export const userDeatilsonScan= async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+
+
+export const addCredits = async (req, res) => {
+  const { tzkid, creditCount } = req.body;
+
+  try {
+    // Validate input
+    if (!tzkid || typeof creditCount !== "number" || creditCount <= 0) {
+      return res.status(400).json({ message: "Invalid input. Please provide a valid Teckzite ID and a positive credit count." });
+    }
+
+    // Find and update the user credits
+    const updatedUser = await User.findOneAndUpdate(
+      { tzkid },
+      { $inc: { credits: creditCount } },
+      { new: true, upsert: false }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the updated user object
+    res.status(200).json({
+      message: "Credits added successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error adding credits:", error.message);
+    res.status(500).json({ message: "An error occurred while adding credits", error: error.message });
+  }
+};

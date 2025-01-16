@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { getNextSequenceValue } from "./countModel.js";
-
 const UserSchema = new mongoose.Schema(
   {
     tzkid: String,
@@ -21,7 +20,7 @@ const UserSchema = new mongoose.Schema(
     city: String,
     sub: { type: String, unique: true },
     idUpload: String,
-    qrimage:String,
+    qrimage: String,
     refreals: {
       type: [{ type: String }],
       default: [],
@@ -36,6 +35,7 @@ const UserSchema = new mongoose.Schema(
     },
     razorpay_order_id: String,
     mode: String,
+    credits: { type: Number, default: 200 },
   },
   {
     timestamps: true,
