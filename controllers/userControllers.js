@@ -11,6 +11,77 @@ import NodeCache from "node-cache";
 const userCache = new NodeCache({ stdTTL: 3600 });
 import axios from "axios"; // Cache users for 1 hour
 import { updateUserCredits } from "../helpers/credits.helpers.js";
+import { google } from "googleapis";
+import multer from "multer";
+
+// Google Drive configuration
+const oauth2Client = new google.auth.OAuth2(
+  process.env.CLIENT_ID,
+  process.env.CLIENT_SECRET,
+  process.env.REDIRECT_URI
+);
+oauth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+
+const drive = google.drive({
+  version: 'v3',
+  auth: oauth2Client,
+});
+
+const uploadToGoogleDrive = async (filePath, mimeType, originalFileName) => {
+  try {
+    const response = await drive.files.create({
+      requestBody: {
+        name: originalFileName, // Use original file name
+        parents: ['YOUR_GOOGLE_DRIVE_FOLDER_ID'], // Replace with your folder ID
+        mimeType: mimeType,
+      },
+      media: {
+        mimeType: mimeType,
+        body: fs.createReadStream(filePath),
+      },
+    });
+
+    const fileId = response.data.id;
+
+    // Make the file public
+    await drive.permissions.create({
+      fileId: fileId,
+      requestBody: {
+        role: 'reader',
+        type: 'anyone',
+      },
+    });
+
+    // Get the public link
+    const result = await drive.files.get({
+      fileId: fileId,
+      fields: 'webViewLink',
+    });
+
+    return result.data.webViewLink;
+  } catch (error) {
+    console.error('Error uploading file to Google Drive:', error);
+    throw new Error('Failed to upload file to Google Drive');
+  }
+};
+
+// Multer configuration for handling file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = 'uploads/';
+    fs.mkdirSync(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+}).single('idUpload');
+
 
 
 export const loginUser = async (req, res) => {
@@ -103,91 +174,105 @@ export const editUser = async (req, res) => {
 
 
 export const registerUser = async (req, res) => {
-  const {
-    email,
-    firstName,
-    amountPaid,
-    lastName,
-    college,
-    phno,
-    year,
-    branch,
-    collegeId,
-    gender,
-    img,
-    state,
-    district,
-    idUpload,
-    city,
-    mode,
-    referredBy,
-  } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: 'File upload error' });
     }
 
-    if (!mode) {
-      return res.status(400).json({ error: "Mode Error" });
-    }
-
-    // Assuming razorpay_order_id is defined somewhere
-    if (mode !== "offline_mode" && !razorpay_order_id) {
-      return res.status(400).json({ error: "Payment Check Error" });
-    }
-
-    const sub = await bcrypt.hash(email, 12);
-    const user = await User.create({
+    const {
       email,
       firstName,
+      amountPaid,
       lastName,
       college,
-      amountPaid,
       phno,
       year,
       branch,
       collegeId,
       gender,
-      img,
       state,
       district,
-      idUpload,
-      sub,
       city,
-      referredBy,
       mode,
-    });
+      referredBy,
+    } = req.body;
 
-    if (!user) {
-      return res.status(400).json({ message: "User not registered" });
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      if (!mode) {
+        return res.status(400).json({ error: 'Mode Error' });
+      }
+
+      if (mode !== 'offline_mode' && !razorpay_order_id) {
+        return res.status(400).json({ error: 'Payment Check Error' });
+      }
+
+      const sub = await bcrypt.hash(email, 12);
+
+      let idUploadLink = null;
+      if (req.file) {
+        // Upload the ID file to Google Drive
+        idUploadLink = await uploadToGoogleDrive(
+          req.file.path,
+          req.file.mimetype,
+          req.file.originalname
+        );
+
+        // Delete the local file after uploading to Google Drive
+        fs.unlinkSync(req.file.path);
+      }
+
+      const user = await User.create({
+        email,
+        firstName,
+        lastName,
+        college,
+        amountPaid,
+        phno,
+        year,
+        branch,
+        collegeId,
+        gender,
+        state,
+        district,
+        idUpload: idUploadLink, // Store the Google Drive link
+        sub,
+        city,
+        referredBy,
+        mode,
+      });
+
+      if (!user) {
+        return res.status(400).json({ message: 'User not registered' });
+      }
+
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: '1d',
+      });
+
+      // Generate QR code image
+      const qrUrl = `https://teckzite.vercel.app/user/user-info/${user._id}`;
+      const qrCodeImage = await QRCode.toDataURL(qrUrl);
+
+      // Save QR code to user
+      user.qrimage = qrCodeImage;
+      await user.save();
+
+      // Send email
+      await sendemail(user);
+
+      return res
+        .status(200)
+        .json({ user, token, message: 'Registration Successful' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    // Generate the URL based on user _id
-    const qrUrl = `https://teckzite.vercel.app/user/user-info/${user._id}`;
-    // Generate QR code image
-    const qrCodeImage = await QRCode.toDataURL(qrUrl);
-
-    // Save the QR code image to the database along with other user information
-    user.qrimage = qrCodeImage; // Assuming you have a field named qrCodeImage in your User schema
-    await user.save();
-
-    // Send email
-    await sendemail(user);
-
-    userCache.del("users");
-    return res
-      .status(200)
-      .json({ user, token, message: "Registration Successful" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
+  });
 };
 
 
