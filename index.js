@@ -14,6 +14,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 import qrRoutes from './routes/qrRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -55,7 +56,7 @@ app.use("/notifications", notificationRoutes);
 app.use("/admin", adminRoutes);
 app.use("/room", roomRoutes);
 app.use("/qr",qrRoutes);
-
+app.use("/uploads",uploadRoutes)
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);
 app.get('/', (req, res) => {
