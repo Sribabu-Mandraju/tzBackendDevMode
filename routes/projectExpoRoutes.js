@@ -3,9 +3,9 @@ const router = express.Router();
 const projectExpoController = require('../controllers/projectExpoController');
 
 // Routes
-router.post('/projects',verifyUserToken, projectExpoController.createProject);
-router.get('/projects',adminTokenCheck, projectExpoController.getAllProjects);
-router.put('/projects/:id',verifyUserToken, projectExpoController.updateProject);
-router.delete('/projects/:id',verifyUserToken, projectExpoController.deleteProject);
+router.post('/',verifyUserToken, projectExpoController.createProject);
+router.get('/',adminTokenCheck, projectExpoController.getAllProjects);
+router.put('/:id',verifyUserToken, projectExpoController.updateProject);
+router.delete('/:id',verifyUserToken, projectExpoController.deleteProject);
 
 module.exports = router;
