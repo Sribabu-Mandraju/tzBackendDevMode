@@ -14,7 +14,11 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
 import qrRoutes from './routes/qrRoutes.js';
+<<<<<<< HEAD
 import uploadRoutes from './routes/uploadRoutes.js';
+=======
+import projectExpoRoutes from './routes/projectExpoRoutes.js';
+>>>>>>> f81b0395c45a1a59c5f2e10a9722903b031c67a8
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -56,7 +60,12 @@ app.use("/notifications", notificationRoutes);
 app.use("/admin", adminRoutes);
 app.use("/room", roomRoutes);
 app.use("/qr",qrRoutes);
+<<<<<<< HEAD
 app.use("/uploads",uploadRoutes)
+=======
+app.use("/projectExpo",projectExpoRoutes);
+
+>>>>>>> f81b0395c45a1a59c5f2e10a9722903b031c67a8
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);
 app.get('/', (req, res) => {
