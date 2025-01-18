@@ -1,4 +1,5 @@
-const ProjectExpo = require('../models/projectExpo'); // Adjust the path as needed
+import ProjectExpo from '../models/projectExpo.js'; // Adjust the path as needed
+import User from '../models/user.js'; // Import the User model (assuming it exists)
 
 // Controller for CRUD operations
 const projectExpoController = {
@@ -9,9 +10,9 @@ const projectExpoController = {
 
       // Check if tzids are valid
       const validTzids = await User.find({ tzkid: { $in: tzids } }).select('tzkid').lean();
-      const validTzidList = validTzids.map(user => user.tzkid);
+      const validTzidList = validTzids.map((user) => user.tzkid);
 
-      const invalidTzids = tzids.filter(tzid => !validTzidList.includes(tzid));
+      const invalidTzids = tzids.filter((tzid) => !validTzidList.includes(tzid));
       if (invalidTzids.length > 0) {
         return res.status(400).json({
           error: 'Invalid TZIDs provided',
@@ -75,4 +76,5 @@ const projectExpoController = {
   },
 };
 
-module.exports = projectExpoController;
+// Export the controller
+export default projectExpoController;

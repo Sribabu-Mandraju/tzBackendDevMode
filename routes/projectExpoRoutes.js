@@ -1,11 +1,13 @@
-const express = require('express');
+import express from 'express';
+import { createProject, getAllProjects, updateProject, deleteProject } from '../controllers/projectExpoController.js';
+import { verifyUserToken, adminTokenCheck } from '../middlewares/authMiddleware.js'; // Assuming middleware is defined separately
+
 const router = express.Router();
-const projectExpoController = require('../controllers/projectExpoController');
 
 // Routes
-router.post('/',verifyUserToken, projectExpoController.createProject);
-router.get('/',adminTokenCheck, projectExpoController.getAllProjects);
-router.put('/:id',verifyUserToken, projectExpoController.updateProject);
-router.delete('/:id',verifyUserToken, projectExpoController.deleteProject);
+router.post('/', verifyUserToken, createProject);
+router.get('/', adminTokenCheck, getAllProjects);
+router.put('/:id', verifyUserToken, updateProject);
+router.delete('/:id', verifyUserToken, deleteProject);
 
-module.exports = router;
+export default router;

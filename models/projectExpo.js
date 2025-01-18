@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const projectExpoSchema = new mongoose.Schema({
   tzids: {
@@ -21,4 +21,4 @@ const projectExpoSchema = new mongoose.Schema({
 
 const ProjectExpo = mongoose.model('ProjectExpo', projectExpoSchema);
 
-module.exports = ProjectExpo;
+export default ProjectExpo;
