@@ -1,24 +1,33 @@
 import ProjectExpo from '../models/projectExpo.js'; // Adjust the path as needed
 import User from '../models/userModel.js';
+
 // Create a new ProjectExpo
 export const createProject = async (req, res) => {
   try {
-    const { tzids, projectName, abstract, file } = req.body;
+    const { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
 
-    // Check if tzids are valid
-    const validTzids = await User.find({ tzkid: { $in: tzids } }).select('tzkid').lean();
-    const validTzidList = validTzids.map((user) => user.tzkid);
+    // Validate `teamMembers`
+    const tzids = teamMembers.map((member) => member.tkzid);
+    const validUsers = await User.find({ tzkid: { $in: tzids } }).select('tzkid').lean();
+    const validTzidList = validUsers.map((user) => user.tzkid);
 
     const invalidTzids = tzids.filter((tzid) => !validTzidList.includes(tzid));
     if (invalidTzids.length > 0) {
       return res.status(400).json({
-        error: 'Invalid TZIDs provided',
+        error: 'Invalid team member TZIDs provided',
         invalidTzids,
       });
     }
 
+    // Validate `problemStatementNumber`
+    if (![1, 2, 3, 4, 5, 6].includes(problemStatementNumber)) {
+      return res.status(400).json({
+        error: 'Invalid problemStatementNumber. Allowed values are [1, 2, 3, 4, 5, 6]',
+      });
+    }
+
     // Create a new ProjectExpo document
-    const newProject = new ProjectExpo({ tzids, projectName, abstract, file });
+    const newProject = new ProjectExpo({ teamMembers, projectName, abstract, file, problemStatementNumber });
     await newProject.save();
 
     res.status(201).json({ message: 'Project created successfully', data: newProject });
@@ -41,7 +50,36 @@ export const getAllProjects = async (req, res) => {
 export const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedData = req.body;
+    const { teamMembers, problemStatementNumber, ...otherData } = req.body;
+
+    // Validate `teamMembers` if provided
+    if (teamMembers) {
+      const tzids = teamMembers.map((member) => member.tkzid);
+      const validUsers = await User.find({ tzkid: { $in: tzids } }).select('tzkid').lean();
+      const validTzidList = validUsers.map((user) => user.tzkid);
+
+      const invalidTzids = tzids.filter((tzid) => !validTzidList.includes(tzid));
+      if (invalidTzids.length > 0) {
+        return res.status(400).json({
+          error: 'Invalid team member TZIDs provided',
+          invalidTzids,
+        });
+      }
+    }
+
+    // Validate `problemStatementNumber` if provided
+    if (problemStatementNumber && ![1, 2, 3, 4, 5, 6].includes(problemStatementNumber)) {
+      return res.status(400).json({
+        error: 'Invalid problemStatementNumber. Allowed values are [1, 2, 3, 4, 5, 6]',
+      });
+    }
+
+    // Update the ProjectExpo document
+    const updatedData = {
+      ...otherData,
+      ...(teamMembers && { teamMembers }),
+      ...(problemStatementNumber && { problemStatementNumber }),
+    };
 
     const updatedProject = await ProjectExpo.findByIdAndUpdate(id, updatedData, { new: true });
 
