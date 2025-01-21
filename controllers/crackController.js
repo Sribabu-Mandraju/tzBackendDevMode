@@ -12,7 +12,18 @@ export const checkPassword = async (req, res) => {
     const isMatch = await bcrypt.compare(password, presetPassword);
 
     if (isMatch) {
-      // If passwords match, store the user's details in CrackedUsers
+      // Check if there are any users in CrackedUser collection
+      const crackedUsers = await CrackedUser.find().sort({ crackedAt: 1 }); // Sort by timestamp (ascending)
+
+      if (crackedUsers.length > 0) {
+        // If the password has already been cracked, return the collegeId of the first user who cracked it
+        const firstCrackedUser = crackedUsers[0]; // First user who cracked the password (based on the earliest timestamp)
+        return res.status(400).json({
+          message: `Password already cracked by ${firstCrackedUser.collegeId}`,
+        });
+      }
+
+      // If no users have cracked the password, store the user's details in CrackedUsers
       await CrackedUser.create({ collegeId });
       res.status(200).json({ message: "Password cracked successfully" });
     } else {
@@ -32,12 +43,16 @@ export const setPresetPassword = async (req, res) => {
 
     // In a real-world scenario, you would update this in a secure storage or environment variable
     // For this example, we'll just send a success message
-    res.status(200).json({ message: "Preset password updated successfully", hashedPassword });
+    res
+      .status(200)
+      .json({
+        message: "Preset password updated successfully",
+        hashedPassword,
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 export const isPasswordCracked = async (req, res) => {
   try {
