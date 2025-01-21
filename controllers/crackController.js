@@ -37,3 +37,26 @@ export const setPresetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+export const isPasswordCracked = async (req, res) => {
+  try {
+    // Get all cracked users ordered by timestamp
+    const crackedUsers = await CrackedUser.find().sort({ crackedAt: 1 }); // 1 for ascending order (oldest first)
+
+    if (crackedUsers.length > 0) {
+      const firstUser = crackedUsers[0]; // The first user based on timestamp
+      res.status(200).json({
+        isCracked: true,
+        collegeId: firstUser.collegeId,
+      });
+    } else {
+      res.status(200).json({
+        isCracked: false,
+        collegeId: null,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
