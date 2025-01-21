@@ -5,6 +5,6 @@ import adminTokenCheck from "../middleware/adminTokenCheck.js";
 const router = express.Router();
 
 router.post("/login", adminLogin);
-router.post("/register", adminTokenCheck, adminRegister);
+router.post("/register", adminRegister);
 
 export default router;

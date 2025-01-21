@@ -16,6 +16,7 @@ import roomRoutes from "./routes/roomRoutes.js";
 import qrRoutes from './routes/qrRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import projectExpoRoutes from './routes/projectExpoRoutes.js';
+import crackedRoutes from './routes/crackedRoutes.js';
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -59,6 +60,7 @@ app.use("/room", roomRoutes);
 app.use("/qr",qrRoutes);
 app.use("/uploads",uploadRoutes)
 app.use("/projectExpo",projectExpoRoutes);
+app.use("/crack",crackedRoutes)
 
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);
