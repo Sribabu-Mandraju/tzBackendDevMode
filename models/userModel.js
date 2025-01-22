@@ -46,7 +46,7 @@ UserSchema.pre("save", async function (next) {
   if (!this.tzkid) {
     try {
       const sequenceValue = await getNextSequenceValue("tzkid_counter");
-      this.tzkid = `tzk24${sequenceValue.toString().padStart(4, "0")}`;
+      this.tzkid = `tzk25${sequenceValue.toString().padStart(4, "0")}`;
     } catch (error) {
       return next(error);
     }
