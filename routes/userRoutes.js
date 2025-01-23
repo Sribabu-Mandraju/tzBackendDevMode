@@ -26,7 +26,7 @@ router.delete('/delete/:id',deleteUser)
 router.get("/getAll", adminTokenCheck, fetchUsers);
 router.get("/", verifyUserToken, fetchUser);
 router.get("/:id", adminTokenCheck, fetchUserById);
-router.put("/addcredits",adminTokenCheck, addCredits)
+router.put("/addcredits", addCredits)
 
 router.post("/order/create", createOrder);
 router.post("/order/verify", paymentVerification);
