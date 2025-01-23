@@ -170,7 +170,7 @@ export const registerUser = async (req, res) => {
     });
 
     // Generate the URL based on user _id
-    const qrUrl = `https://teckzite.vercel.app/user/user-info/${user._id}`;
+    const qrUrl = `https://teckzite.org/user/user-info/${user._id}`;
     // Generate QR code image
     const qrCodeImage = await QRCode.toDataURL(qrUrl);
 
