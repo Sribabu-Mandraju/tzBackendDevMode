@@ -28,8 +28,8 @@ const nodeCache=new NodeCache({
   stdTTL:60
 })
 app.use(express.json());
-app.use(bodyParser.json({ limit: "1mb" }));
-app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 
 app.use(cors('*'));
 

@@ -399,6 +399,7 @@ export const paymentVerification = async (req, res) => {
     }
 
     // Send email notification
+    console.log("called")
     await sendemail(user);
 
     // Clear user cache
@@ -424,13 +425,15 @@ export const paymentVerification = async (req, res) => {
 
 
 const sendemail = async (user) => {
+  console.log("called")
+
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.email",
       service: "gmail",
       auth: {
         user: "codewithsiddhu@gmail.com",
-        pass: "dlal duio nspt uiul",
+        pass: "kahj opey xkmf axdh",
       },
       tls: {
         rejectUnauthorized: false,
