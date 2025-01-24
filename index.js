@@ -17,6 +17,7 @@ import qrRoutes from './routes/qrRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import projectExpoRoutes from './routes/projectExpoRoutes.js';
 import crackedRoutes from './routes/crackedRoutes.js';
+import hackathonRoutes from './routes/hackathonRoutes.js'
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -61,6 +62,7 @@ app.use("/qr",qrRoutes);
 app.use("/uploads",uploadRoutes)
 app.use("/projectExpo",projectExpoRoutes);
 app.use("/crack",crackedRoutes)
+app.use("/hackathon",hackathonRoutes);
 
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);

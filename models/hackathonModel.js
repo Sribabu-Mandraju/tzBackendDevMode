@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 
 const teamMemberSchema = new mongoose.Schema({
-  tkzid: {
+  tzkid: {
     type: String, // Unique identifier for each member
     required: true,
+    unique: true,
   },
   name: {
     type: String, // Name of the team member
@@ -11,15 +12,15 @@ const teamMemberSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String, // Phone number of the team member
-    required: true,
+    // required: true,
   },
   branch: {
     type: String, // Branch of the team member
-    required: true,
+    // required: true,
   },
 });
 
-const projectExpoSchema = new mongoose.Schema({
+const hackathonSchema = new mongoose.Schema({
   teamMembers: {
     type: [teamMemberSchema], // Array of team members
     required: true,
@@ -49,6 +50,6 @@ function arrayLimit(val) {
   return val.length > 0; // Ensure at least one team member exists
 }
 
-const ProjectExpo = mongoose.model('ProjectExpo', projectExpoSchema);
+const Hackathon = mongoose.model('Hackathon', hackathonSchema);
 
-export default ProjectExpo;
+export default Hackathon;
