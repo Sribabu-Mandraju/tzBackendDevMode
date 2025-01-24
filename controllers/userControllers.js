@@ -595,7 +595,7 @@ const sendemail = async (user) => {
             <p>First Name: ${user.firstName}</p>
             <p>Last Name:${user.lastName}</p>
             <p>College: ${user.college}</p>
-            <<p>Phone Number: ${user.phno}</p>
+            <p>Phone Number: ${user.phno}</p>
             <p>Year: ${user.year}</p>
             <p>Branch: ${user.branch}</p>
             <p>College ID: ${user.collegeId}</p>
