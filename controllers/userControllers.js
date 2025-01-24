@@ -433,7 +433,7 @@ const sendemail = async (user) => {
       service: "gmail",
       auth: {
         user: "codewithsiddhu@gmail.com",
-        pass: "kahj opey xkmf axdh",
+        pass: "rntq kped xnte ucwm",
       },
       tls: {
         rejectUnauthorized: false,
