@@ -12,11 +12,11 @@ const teamMemberSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String, // Phone number of the team member
-    required: true,
+    // required: true,
   },
   branch: {
     type: String, // Branch of the team member
-    required: true,
+    // required: true,
   },
 });
 
