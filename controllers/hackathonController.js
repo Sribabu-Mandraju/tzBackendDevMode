@@ -101,7 +101,7 @@ export const addTeamMember = async (req, res) => {
 // Remove a team member from a Hackathon
 export const removeTeamMember = async (req, res) => {
   try {
-    const { id, tkzid } = req.params;
+    const { id, tzkid } = req.params;
 
     const hackathon = await Hackathon.findById(id);
 
@@ -109,7 +109,7 @@ export const removeTeamMember = async (req, res) => {
       return res.status(404).json({ message: "Hackathon entry not found." });
     }
 
-    hackathon.teamMembers = hackathon.teamMembers.filter((member) => member.tkzid !== tkzid);
+    hackathon.teamMembers = hackathon.teamMembers.filter((member) => member.tzkid !== tzkid);
     await hackathon.save();
 
     res.status(200).json({ message: "Team member removed successfully!", hackathon });

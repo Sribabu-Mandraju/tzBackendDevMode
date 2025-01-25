@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const teamMemberSchema = new mongoose.Schema({
   tzkid: {
     type: String, // Unique identifier for each member
-    required: true,
+    // required: true,
     // unique:true,
   },
   name: {
     type: String, // Name of the team member
-    required: true,
+    // required: true,
   },
   phoneNumber: {
     type: String, // Phone number of the team member
@@ -50,6 +50,6 @@ function arrayLimit(val) {
   return val.length > 0; // Ensure at least one team member exists
 }
 
-const ProjectExpo = mongoose.model('ProjectExpo', projectExpoSchema);
+const ProjectExpo = mongoose.model('ProjectExpoNew', projectExpoSchema);
 
 export default ProjectExpo;
