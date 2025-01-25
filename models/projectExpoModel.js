@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 const teamMemberSchema = new mongoose.Schema({
   tzkid: {
     type: String, // Unique identifier for each member
-    // required: true,
-    // unique:true,
+    required: true,
+    unique:true,
   },
   name: {
     type: String, // Name of the team member
