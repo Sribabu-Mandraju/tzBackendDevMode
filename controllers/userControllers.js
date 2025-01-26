@@ -1,4 +1,3 @@
-
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -6,13 +5,13 @@ import { instance } from "../index.js";
 import crypto from "crypto";
 import SignUser from "../models/signUserModel.js";
 import { log } from "console";
-import nodemailer from 'nodemailer'
-import QRCode from 'qrcode'
+import nodemailer from "nodemailer";
+import QRCode from "qrcode";
 import NodeCache from "node-cache";
 const userCache = new NodeCache({ stdTTL: 3600 });
 import axios from "axios"; // Cache users for 1 hour
 import { updateUserCredits } from "../helpers/credits.helpers.js";
-
+import { colleges } from "../constants";
 
 export const loginUser = async (req, res) => {
   const { email, sub } = req.body;
@@ -102,7 +101,6 @@ export const editUser = async (req, res) => {
   }
 };
 
-
 export const registerUser = async (req, res) => {
   const {
     email,
@@ -191,12 +189,14 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
 export const fetchUsers = async (req, res) => {
   try {
     let users = userCache.get("users");
     if (!users) {
-      users = await User.find({}, '-sub -idUpload -refreals -regEvents -regWorkshop').lean();
+      users = await User.find(
+        {},
+        "-sub -idUpload -refreals -regEvents -regWorkshop"
+      ).lean();
       userCache.set("users", users);
     }
     return res.status(200).json({ users });
@@ -206,8 +206,6 @@ export const fetchUsers = async (req, res) => {
   }
 };
 
-
- 
 export const fetchUserById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -279,6 +277,8 @@ export const createOrder = async (req, res) => {
   let ramount = amount;
   if (domainPattern.test(email)) {
     ramount = Number(process.env.FEE_RGUKT);
+  } else if (colleges.includes(college)) {
+    ramount = Number(process.env.FEE_RGUKT);
   } else {
     ramount = Number(process.env.FEE_OUTSIDERS);
   }
@@ -293,7 +293,6 @@ export const createOrder = async (req, res) => {
   }
   res.status(200).send({ order, status: "success" });
 };
-
 
 export const paymentVerification = async (req, res) => {
   const {
@@ -386,7 +385,10 @@ export const paymentVerification = async (req, res) => {
           // Add credits to the referring user's account
           await updateUserCredits(userData.referredBy.toLowerCase(), 50);
         } catch (creditError) {
-          console.error("Error adding credits to referrer:", creditError.message);
+          console.error(
+            "Error adding credits to referrer:",
+            creditError.message
+          );
         }
       } else {
         return res.status(200).json({
@@ -399,7 +401,7 @@ export const paymentVerification = async (req, res) => {
     }
 
     // Send email notification
-    console.log("called")
+    console.log("called");
     await sendemail(user);
 
     // Clear user cache
@@ -422,10 +424,8 @@ export const paymentVerification = async (req, res) => {
   }
 };
 
-
-
 const sendemail = async (user) => {
-  console.log("called")
+  console.log("called");
 
   try {
     const transporter = nodemailer.createTransport({
@@ -613,11 +613,11 @@ const sendemail = async (user) => {
       `,
       attachments: [
         {
-          filename: 'qrcode.png',
+          filename: "qrcode.png",
           path: `${user.qrimage}`,
-          cid: 'qrimae'
-        }
-      ]
+          cid: "qrimae",
+        },
+      ],
     };
 
     // Send the email
@@ -627,8 +627,6 @@ const sendemail = async (user) => {
     console.error("Error sending email:", error);
   }
 };
-
-
 
 export const getTopReferrals = async (req, res) => {
   try {
@@ -678,7 +676,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const userDeatilsonScan= async (req, res) => {
+export const userDeatilsonScan = async (req, res) => {
   const { userId } = req.params;
 
   try {
@@ -687,17 +685,16 @@ export const userDeatilsonScan= async (req, res) => {
 
     if (!user) {
       // If user not found, return 404 status
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // If user found, return user data
     return res.status(200).json({ user });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-}
-
+};
 
 export const addCredits = async (req, res) => {
   const { tzkid, creditCount } = req.body;
@@ -705,7 +702,10 @@ export const addCredits = async (req, res) => {
   try {
     // Validate input
     if (!tzkid || typeof creditCount !== "number" || creditCount <= 0) {
-      return res.status(400).json({ message: "Invalid input. Please provide a valid Teckzite ID and a positive credit count." });
+      return res.status(400).json({
+        message:
+          "Invalid input. Please provide a valid Teckzite ID and a positive credit count.",
+      });
     }
 
     // Find and update the user credits
@@ -726,6 +726,9 @@ export const addCredits = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding credits:", error.message);
-    res.status(500).json({ message: "An error occurred while adding credits", error: error.message });
+    res.status(500).json({
+      message: "An error occurred while adding credits",
+      error: error.message,
+    });
   }
 };
