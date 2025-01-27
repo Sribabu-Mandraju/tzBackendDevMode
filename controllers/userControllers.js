@@ -11,7 +11,7 @@ import NodeCache from "node-cache";
 const userCache = new NodeCache({ stdTTL: 3600 });
 import axios from "axios"; // Cache users for 1 hour
 import { updateUserCredits } from "../helpers/credits.helpers.js";
-import { colleges } from "../constants";
+import colleges  from "../constants/index.js";
 
 export const loginUser = async (req, res) => {
   const { email, sub } = req.body;

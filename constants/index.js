@@ -1,4 +1,4 @@
-const colleges = [
+const  colleges = [
   "CU Kashmir",
   "Institute of Hotel Management, Rajbagh, Srinagar",
   "National Institute of Fashion Technology, Ompora, Budgam",
@@ -85,3 +85,5 @@ const colleges = [
   "National Institute of Technology Calicut, Kerala",
   "National Institute of Technology, Surathkal, Karnataka",
 ];
+
+export default colleges;
