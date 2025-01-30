@@ -6,11 +6,14 @@ import {
   deleteHackathon,
 } from '../controllers/hackathonController.js';
 
+import { verifyUserToken } from '../middleware/auth.js';
+import adminTokenCheck from '../middleware/adminTokenCheck.js';
+
 const router = express.Router();
 
-router.post('/', createHackathon);
-router.get('/', getAllHackathons);
-router.put('/:id', updateHackathon);
-router.delete('/:id', deleteHackathon);
+router.post('/',verifyUserToken, createHackathon);
+router.get('/', adminTokenCheck,getAllHackathons);
+router.put('/:id',adminTokenCheck, updateHackathon);
+router.delete('/:id',adminTokenCheck, deleteHackathon);
 
 export default router;
