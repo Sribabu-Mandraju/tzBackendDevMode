@@ -112,7 +112,7 @@ export const deleteWorkshop = async (req, res) => {
   try {
     const del = await Workshop.findByIdAndDelete(id);
     if (!del) {
-      return res.status(400).json({ errro: "No Workshop found" });
+      return res.status(400).json({ error: "No Workshop found" });
     }
     return res.status(200).json({ message: "Deleted Succesfully" });
   } catch (error) {
