@@ -17,6 +17,7 @@ import qrRoutes from './routes/qrRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import projectExpoRoutes from './routes/projectExpoRoutes.js';
 import crackedRoutes from './routes/crackedRoutes.js';
+import hackathonRoutes from './routes/hackathonRoutes.js'
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -28,8 +29,8 @@ const nodeCache=new NodeCache({
   stdTTL:60
 })
 app.use(express.json());
-app.use(bodyParser.json({ limit: "1mb" }));
-app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 
 app.use(cors('*'));
 
@@ -61,6 +62,7 @@ app.use("/qr",qrRoutes);
 app.use("/uploads",uploadRoutes)
 app.use("/projectExpo",projectExpoRoutes);
 app.use("/crack",crackedRoutes)
+app.use("/hackathon",hackathonRoutes);
 
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);

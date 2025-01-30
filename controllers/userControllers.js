@@ -1,4 +1,3 @@
-
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -6,13 +5,13 @@ import { instance } from "../index.js";
 import crypto from "crypto";
 import SignUser from "../models/signUserModel.js";
 import { log } from "console";
-import nodemailer from 'nodemailer'
-import QRCode from 'qrcode'
+import nodemailer from "nodemailer";
+import QRCode from "qrcode";
 import NodeCache from "node-cache";
 const userCache = new NodeCache({ stdTTL: 3600 });
 import axios from "axios"; // Cache users for 1 hour
 import { updateUserCredits } from "../helpers/credits.helpers.js";
-
+import colleges  from "../constants/index.js";
 
 export const loginUser = async (req, res) => {
   const { email, sub } = req.body;
@@ -102,7 +101,6 @@ export const editUser = async (req, res) => {
   }
 };
 
-
 export const registerUser = async (req, res) => {
   const {
     email,
@@ -191,12 +189,14 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
 export const fetchUsers = async (req, res) => {
   try {
     let users = userCache.get("users");
     if (!users) {
-      users = await User.find({}, '-sub -idUpload -refreals -regEvents -regWorkshop').lean();
+      users = await User.find(
+        {},
+        "-sub -idUpload -refreals -regEvents -regWorkshop"
+      ).lean();
       userCache.set("users", users);
     }
     return res.status(200).json({ users });
@@ -206,8 +206,6 @@ export const fetchUsers = async (req, res) => {
   }
 };
 
-
- 
 export const fetchUserById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -279,6 +277,8 @@ export const createOrder = async (req, res) => {
   let ramount = amount;
   if (domainPattern.test(email)) {
     ramount = Number(process.env.FEE_RGUKT);
+  } else if (colleges.includes(college)) {
+    ramount = Number(process.env.FEE_RGUKT);
   } else {
     ramount = Number(process.env.FEE_OUTSIDERS);
   }
@@ -293,7 +293,6 @@ export const createOrder = async (req, res) => {
   }
   res.status(200).send({ order, status: "success" });
 };
-
 
 export const paymentVerification = async (req, res) => {
   const {
@@ -386,7 +385,10 @@ export const paymentVerification = async (req, res) => {
           // Add credits to the referring user's account
           await updateUserCredits(userData.referredBy.toLowerCase(), 50);
         } catch (creditError) {
-          console.error("Error adding credits to referrer:", creditError.message);
+          console.error(
+            "Error adding credits to referrer:",
+            creditError.message
+          );
         }
       } else {
         return res.status(200).json({
@@ -399,6 +401,7 @@ export const paymentVerification = async (req, res) => {
     }
 
     // Send email notification
+    console.log("called");
     await sendemail(user);
 
     // Clear user cache
@@ -421,16 +424,16 @@ export const paymentVerification = async (req, res) => {
   }
 };
 
-
-
 const sendemail = async (user) => {
+  console.log("called");
+
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.email",
       service: "gmail",
       auth: {
         user: "codewithsiddhu@gmail.com",
-        pass: "dlal duio nspt uiul",
+        pass: "rntq kped xnte ucwm",
       },
       tls: {
         rejectUnauthorized: false,
@@ -444,69 +447,153 @@ const sendemail = async (user) => {
       subject: "Teckzite Registration Successful",
       html: `
       <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Teckzite Registration Successful</title>
-        <style>
-          /* Reset styles */
-          body, h1, p {
-            margin: 0;
-            padding: 0;
-          }
-          
-          /* Container styles */
-          .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: black;
-          }
-          
-          /* Header styles */
-          .header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-          }
-          
-          /* Content styles */
-          .content {
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            margin-top: 20px;
-            background: rgba( 74, 164, 41, 0.25 );
-            box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-            backdrop-filter: blur( 13.5px );
-            -webkit-backdrop-filter: blur( 13.5px );
-            border-radius: 10px;
-            border: 1px solid rgba( 255, 255, 255, 0.18 );
-            color:white;
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Design</title>
+    <style>
+     body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #00ffee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-          }
-          
-          /* Footer styles */
-          .footer {
-            text-align: center;
-            margin-top: 20px;
-            color:white;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Teckzite Registration Successfull</h1>
-          </div>
-          <div class="content">
-            <p>TZKID: ${user.tzkid}</p>
+.profile-container {
+    width: 350px;
+    background: linear-gradient(145deg, #002233, #001122);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+    overflow-y: auto; /* Enable scrolling */
+    max-height: 90vh;
+    padding: 20px;
+    text-align: center;
+    color: #00ffee;
+    position: relative;
+}
+
+.profile-container::-webkit-scrollbar {
+    width: 0; 
+    height: 0;
+}
+
+.profile-container {
+    scrollbar-width: none; 
+}
+
+.profile-container {
+    -ms-overflow-style: none; 
+}
+
+
+.profile-header {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.profile-header::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 100px;
+    background: linear-gradient(145deg, #00ffee, #004466);
+    clip-path: polygon(100% 0, 100% 20%, 100% 84%, 86% 100%, 0 100%, 0 14%, 14% 0);
+    z-index: -1;
+}
+
+.profile-header h1 {
+    margin: 0;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #00ffee, #004466);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.teckid {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px auto;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(145deg, #00ffee, #004466);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.profile-details {
+    background: linear-gradient(145deg, #002233, #001122);
+    border: 1px solid #00ffee;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 10px 0;
+}
+
+.profile-details span {
+    font-weight: bold;
+    color: #00ffee;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #000;
+    background: #00ffee;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+     
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="https://api.spicezgold.com/download/file_1737715321555_robo.png" alt="Avatar">
+            </div>
+            <h3>Teckzite Registration Successful</h3>
+        </div>
+        <div class="teckid">
+            <span>TZID: ${user.tzkid}</span>
+        </div>
+        <div class="profile-details">
             <p>Email: ${user.email}</p>
             <p>First Name: ${user.firstName}</p>
-            <p>Last Name: ${user.lastName}</p>
+            <p>Last Name:${user.lastName}</p>
             <p>College: ${user.college}</p>
             <p>Phone Number: ${user.phno}</p>
             <p>Year: ${user.year}</p>
@@ -518,20 +605,19 @@ const sendemail = async (user) => {
             <p>Payment Mode: ${user.mode}</p>
             <img src="cid:qrimae" alt='qrimage' style="width: 100px; height: 100px;" />
           </div>
-          <div class="footer">
-            <marquee>Thank you for registring</marquee>
-          </div>
-        </div>
-      </body>
-      </html>
+      
+       
+    </div>
+</body>
+</html>
       `,
       attachments: [
         {
-          filename: 'qrcode.png',
+          filename: "qrcode.png",
           path: `${user.qrimage}`,
-          cid: 'qrimae'
-        }
-      ]
+          cid: "qrimae",
+        },
+      ],
     };
 
     // Send the email
@@ -541,8 +627,6 @@ const sendemail = async (user) => {
     console.error("Error sending email:", error);
   }
 };
-
-
 
 export const getTopReferrals = async (req, res) => {
   try {
@@ -592,7 +676,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const userDeatilsonScan= async (req, res) => {
+export const userDeatilsonScan = async (req, res) => {
   const { userId } = req.params;
 
   try {
@@ -601,17 +685,16 @@ export const userDeatilsonScan= async (req, res) => {
 
     if (!user) {
       // If user not found, return 404 status
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // If user found, return user data
     return res.status(200).json({ user });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-}
-
+};
 
 export const addCredits = async (req, res) => {
   const { tzkid, creditCount } = req.body;
@@ -619,7 +702,10 @@ export const addCredits = async (req, res) => {
   try {
     // Validate input
     if (!tzkid || typeof creditCount !== "number" || creditCount <= 0) {
-      return res.status(400).json({ message: "Invalid input. Please provide a valid Teckzite ID and a positive credit count." });
+      return res.status(400).json({
+        message:
+          "Invalid input. Please provide a valid Teckzite ID and a positive credit count.",
+      });
     }
 
     // Find and update the user credits
@@ -640,6 +726,9 @@ export const addCredits = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding credits:", error.message);
-    res.status(500).json({ message: "An error occurred while adding credits", error: error.message });
+    res.status(500).json({
+      message: "An error occurred while adding credits",
+      error: error.message,
+    });
   }
 };

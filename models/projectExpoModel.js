@@ -1,21 +1,22 @@
 import mongoose from 'mongoose';
 
 const teamMemberSchema = new mongoose.Schema({
-  tkzid: {
+  tzkid: {
     type: String, // Unique identifier for each member
     required: true,
+    unique:true,
   },
   name: {
     type: String, // Name of the team member
-    required: true,
+    // required: true,
   },
   phoneNumber: {
     type: String, // Phone number of the team member
-    required: true,
+    // required: true,
   },
   branch: {
     type: String, // Branch of the team member
-    required: true,
+    // required: true,
   },
 });
 
@@ -39,7 +40,7 @@ const projectExpoSchema = new mongoose.Schema({
   },
   problemStatementNumber: {
     type: Number,
-    enum: [1, 2, 3, 4, 5, 6], // Enum with allowed values
+    // enum: [1, 2, 3, 4, 5, 6], // Enum with allowed values
     required: true,
   },
 });
@@ -49,6 +50,6 @@ function arrayLimit(val) {
   return val.length > 0; // Ensure at least one team member exists
 }
 
-const ProjectExpo = mongoose.model('ProjectExpo', projectExpoSchema);
+const ProjectExpo = mongoose.model('ProjectExpoNew', projectExpoSchema);
 
 export default ProjectExpo;
