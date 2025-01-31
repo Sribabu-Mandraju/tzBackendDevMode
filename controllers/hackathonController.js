@@ -1,19 +1,124 @@
 import Hackathon from "../models/hackathonModel.js";
+import User from "../models/userModel.js";
+
 // Create a new Hackathon entry
 export const createHackathon = async (req, res) => {
   try {
-    const { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
+    let { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
 
-    // Validate request body
+    if (!teamMembers || !projectName || !abstract || !file || !problemStatementNumber) {
+      return res.status(400).json({ message: "All required fields must be provided." });
+    }
+   
+    const user = await User.findById(req.user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Standardize teamMembers' data
+    teamMembers = teamMembers.map(member => ({
+      tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
+      name: member.name ? String(member.name).trim() : undefined,
+      phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
+    }));
+
+    // Ensure team size constraints
+    if (teamMembers.length < 1 || teamMembers.length > 4) {
+      return res.status(400).json({ message: "Team should have at least 2 and at most 5 members (4 + you)." });
+    }
+
+    // Add the requesting user as the 5th member
+    const userTzkid = user.tzkid.replace(/\s+/g, '').toLowerCase();
+    const userDetails = {
+      tzkid: userTzkid,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      phoneNumber: user.phno.trim(),
+    };
+    teamMembers.push(userDetails); // Now total team size = 2 to 5
+
+    // Check for duplicate tzkid in the teamMembers list
+    const uniqueTzkids = new Set(teamMembers.map(member => member.tzkid));
+    if (uniqueTzkids.size !== teamMembers.length) {
+      return res.status(400).json({ message: "Duplicate tzkid found in team members." });
+    }
+
+    // Validate all tzkid exist in the User schema
+    const allTzkids = [...uniqueTzkids];
+    const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+
+    if (usersFound.length !== allTzkids.length) {
+      return res.status(400).json({ message: "Some tzkid(s) do not exist in the database." });
+    }
+
+    // Check if any tzkid is already in another team in ProjectExpo
+    const existingProject = await ProjectExpo.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+
+    if (existingProject) {
+      return res.status(409).json({ message: "One or more team members are already part of another project." });
+    }
+
+    // Create the new project entry
+    const projectExpo = new ProjectExpo({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    await projectExpo.save();
+
+    res.status(201).json({ message: "ProjectExpo entry created successfully!", projectExpo });
+
+  } catch (error) {
+    console.error("Detailed Error:", error);
+    res.status(500).json({ message: "Error creating ProjectExpo entry", error: error.errors || error.message });
+  }
+};
+
+export const createHackathonByAdmin = async (req, res) => {
+  try {
+    let { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
+
     if (!teamMembers || !projectName || !abstract || !file || !problemStatementNumber) {
       return res.status(400).json({ message: "All required fields must be provided." });
     }
 
-    const hackathon = new Hackathon({ teamMembers, projectName, abstract, file, problemStatementNumber });
-    await hackathon.save();
-    res.status(201).json({ message: "Hackathon entry created successfully!", hackathon });
+    // Standardize teamMembers' data
+    teamMembers = teamMembers.map(member => ({
+      tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
+      name: member.name ? String(member.name).trim() : undefined,
+      phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
+    }));
+
+    // Ensure team size constraints
+    if (teamMembers.length < 2 || teamMembers.length > 5) {
+      return res.status(400).json({ message: "Team should have at least 2 and at most 5 members." });
+    }
+
+    // Check for duplicate tzkid in the teamMembers list
+    const uniqueTzkids = new Set(teamMembers.map(member => member.tzkid));
+    if (uniqueTzkids.size !== teamMembers.length) {
+      return res.status(400).json({ message: "Duplicate tzkid found in team members." });
+    }
+
+    // Validate all tzkid exist in the User schema
+    const allTzkids = [...uniqueTzkids];
+    const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+
+    if (usersFound.length !== allTzkids.length) {
+      return res.status(400).json({ message: "Some tzkid(s) do not exist in the database." });
+    }
+
+    // Check if any tzkid is already in another team in ProjectExpo
+    const existingProject = await ProjectExpo.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+
+    if (existingProject) {
+      return res.status(409).json({ message: "One or more team members are already part of another project." });
+    }
+
+    // Create the new project entry
+    const projectExpo = new ProjectExpo({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    await projectExpo.save();
+
+    res.status(201).json({ message: "ProjectExpo entry created successfully!", projectExpo });
+
   } catch (error) {
-    res.status(500).json({ message: "Error creating Hackathon entry", error });
+    console.error("Detailed Error:", error);
+    res.status(500).json({ message: "Error creating ProjectExpo entry", error: error.errors || error.message });
   }
 };
 
