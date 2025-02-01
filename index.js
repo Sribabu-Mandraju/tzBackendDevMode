@@ -6,18 +6,18 @@ import dotenv from "dotenv";
 import Razorpay from "razorpay";
 import NodeCache from "node-cache";
 
-
 import userRoutes from "./routes/userRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import workshopRoutes from "./routes/workshopRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import roomRoutes from "./routes/roomRoutes.js";
-import qrRoutes from './routes/qrRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
-import projectExpoRoutes from './routes/projectExpoRoutes.js';
-import crackedRoutes from './routes/crackedRoutes.js';
-import hackathonRoutes from './routes/hackathonRoutes.js'
+import qrRoutes from "./routes/qrRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import projectExpoRoutes from "./routes/projectExpoRoutes.js";
+import crackedRoutes from "./routes/crackedRoutes.js";
+import hackathonRoutes from "./routes/hackathonRoutes.js";
+import appRoutes from "./routes/appRegRoutes.js";
 
 import adminTokenCheck from "./middleware/adminTokenCheck.js";
 import { getAllSignUsers } from "./controllers/userControllers.js";
@@ -25,14 +25,14 @@ import { getAllSignUsers } from "./controllers/userControllers.js";
 //middleware
 dotenv.config();
 const app = express();
-const nodeCache=new NodeCache({
-  stdTTL:60
-})
+const nodeCache = new NodeCache({
+  stdTTL: 60,
+});
 app.use(express.json());
 app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 
-app.use(cors('*'));
+app.use(cors("*"));
 
 export const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -58,14 +58,14 @@ app.use("/workshops", workshopRoutes);
 app.use("/notifications", notificationRoutes);
 app.use("/admin", adminRoutes);
 app.use("/room", roomRoutes);
-app.use("/qr",qrRoutes);
-app.use("/uploads",uploadRoutes)
-app.use("/projectExpo",projectExpoRoutes);
-app.use("/crack",crackedRoutes)
-app.use("/hackathon",hackathonRoutes);
-
+app.use("/qr", qrRoutes);
+app.use("/uploads", uploadRoutes);
+app.use("/projectExpo", projectExpoRoutes);
+app.use("/crack", crackedRoutes);
+app.use("/hackathon", hackathonRoutes);
+app.use("/app", appRoutes);
 
 app.get("/signusers", adminTokenCheck, getAllSignUsers);
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to website of the teckzite" });
 });
