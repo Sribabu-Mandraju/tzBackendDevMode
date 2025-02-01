@@ -85,3 +85,5 @@ export const colleges = [
   "National Institute of Technology Calicut, Kerala",
   "National Institute of Technology, Surathkal, Karnataka",
 ];
+
+export default colleges;
