@@ -20,6 +20,7 @@ export const createHackathon = async (req, res) => {
       tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
       name: member.name ? String(member.name).trim() : undefined,
       phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
+      branch:member.branch ? String(member.branch).trim() : undefined,
     }));
 
     // Ensure team size constraints
@@ -51,25 +52,26 @@ export const createHackathon = async (req, res) => {
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
-    const existingProject = await ProjectExpo.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+    const existingHackathon = await Hackathon.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
 
-    if (existingProject) {
+    if (existingHackathon) {
       return res.status(409).json({ message: "One or more team members are already part of another project." });
     }
 
     // Create the new project entry
-    const projectExpo = new ProjectExpo({ teamMembers, projectName, abstract, file, problemStatementNumber });
-    await projectExpo.save();
+    const hackathon = new Hackathon({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    await hackathon.save();
 
-    res.status(201).json({ message: "ProjectExpo entry created successfully!", projectExpo });
+    res.status(201).json({ message: "Hackathon entry created successfully!", hackathon });
 
   } catch (error) {
     console.error("Detailed Error:", error);
-    res.status(500).json({ message: "Error creating ProjectExpo entry", error: error.errors || error.message });
+    res.status(500).json({ message: "Error creating Hackathon entry", error: error.errors || error.message });
   }
 };
 
 export const createHackathonByAdmin = async (req, res) => {
+  console.log("called createHackathonByAdmin");
   try {
     let { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
 
@@ -82,6 +84,7 @@ export const createHackathonByAdmin = async (req, res) => {
       tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
       name: member.name ? String(member.name).trim() : undefined,
       phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
+      branch:member.branch ? String(member.branch).trim() : undefined,
     }));
 
     // Ensure team size constraints
@@ -104,21 +107,21 @@ export const createHackathonByAdmin = async (req, res) => {
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
-    const existingProject = await ProjectExpo.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+    const existingHackathon = await Hackathon.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
 
-    if (existingProject) {
+    if (existingHackathon) {
       return res.status(409).json({ message: "One or more team members are already part of another project." });
     }
 
     // Create the new project entry
-    const projectExpo = new ProjectExpo({ teamMembers, projectName, abstract, file, problemStatementNumber });
-    await projectExpo.save();
+    const hackathon = new Hackathon({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    await hackathon.save();
 
-    res.status(201).json({ message: "ProjectExpo entry created successfully!", projectExpo });
+    res.status(201).json({ message: "Hackathon entry created successfully!", hackathon });
 
   } catch (error) {
     console.error("Detailed Error:", error);
-    res.status(500).json({ message: "Error creating ProjectExpo entry", error: error.errors || error.message });
+    res.status(500).json({ message: "Error creating Hackathon entry", error: error.errors || error.message });
   }
 };
 
