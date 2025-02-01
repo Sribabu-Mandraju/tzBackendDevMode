@@ -275,11 +275,17 @@ export const createOrder = async (req, res) => {
 
   let ramount = amount;
   if (domainPattern.test(email)) {
-    ramount = Number(process.env.FEE_RGUKT);
-  } else if (colleges.includes(college)) {
-    ramount = Number(process.env.FEE_RGUKT);
+    const offset = email.startsWith("ro") ? 2 : 1;
+    const studentId = email.substring(offset, offset + 6);
+
+    ramount =
+      studentId.startsWith("23") || studentId.startsWith("24")
+        ? Number(process.env.FEE_RGUKT_PUC)
+        : Number(process.env.FEE_RGUKT);
   } else {
-    ramount = Number(process.env.FEE_OUTSIDERS);
+    ramount = colleges.includes(college)
+      ? Number(process.env.FEE_RGUKT)
+      : Number(process.env.FEE_OUTSIDERS);
   }
 
   const order = await instance.orders.create({
