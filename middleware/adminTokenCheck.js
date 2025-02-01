@@ -20,7 +20,9 @@ const adminTokenCheck = async (req, res, next) => {
     req.admin = decodedToken.adminId;
     next();
   } catch (error) {
+    console.error(error);
     return res.status(401).json({ message: "Unauthorized" });
+
   }
 };
 
