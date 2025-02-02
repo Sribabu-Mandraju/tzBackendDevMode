@@ -157,7 +157,7 @@ export const createProjectExpoByAdmin = async (req, res) => {
     // Validate all tzkid exist in the User schema
     const allTzkids = [...uniqueTzkids];
     const usersFound = await User.find({
-      "teamMembers.tzkid": { $in: allTzkids },
+      tzkid: { $in: allTzkids },
     });
 
     if (usersFound.length !== allTzkids.length) {
