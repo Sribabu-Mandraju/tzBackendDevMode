@@ -136,7 +136,7 @@ export const registerUser = async (req, res) => {
     if (mode !== "offline_mode" && !razorpay_order_id) {
       return res.status(400).json({ error: "Payment Check Error" });
     }
-
+    f;
     const sub = await bcrypt.hash(email, 12);
     const user = await User.create({
       email,
@@ -276,7 +276,7 @@ export const createOrder = async (req, res) => {
 
   let ramount = amount;
   if (domainPattern.test(email)) {
-    const offset = 2;
+    const offset = 1;
     const studentId = email.substring(offset, offset + 6);
 
     ramount =
