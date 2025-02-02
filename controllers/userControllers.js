@@ -136,7 +136,7 @@ export const registerUser = async (req, res) => {
     if (mode !== "offline_mode" && !razorpay_order_id) {
       return res.status(400).json({ error: "Payment Check Error" });
     }
-    f;
+    ;
     const sub = await bcrypt.hash(email, 12);
     const user = await User.create({
       email,
