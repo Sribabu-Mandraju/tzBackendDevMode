@@ -69,7 +69,9 @@ export const createProjectExpo = async (req, res) => {
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
-    const checkAll = await ProjectExpo.find({ teamMembers: allTzkids });
+    const checkAll = await ProjectExpo.find({
+      "teamMembers.tzkid": { $all: allTzkids },
+    });
     if (!checkAll) {
       const existingProject = await ProjectExpo.findOne({
         "teamMembers.tzkid": { $in: allTzkids },
@@ -151,7 +153,9 @@ export const createProjectExpoByAdmin = async (req, res) => {
 
     // Validate all tzkid exist in the User schema
     const allTzkids = [...uniqueTzkids];
-    const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+    const usersFound = await User.find({
+      "teamMembers.tzkid": { $all: allTzkids },
+    });
 
     if (usersFound.length !== allTzkids.length) {
       return res
