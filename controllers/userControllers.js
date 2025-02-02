@@ -197,6 +197,25 @@ export const fetchUsers = async (req, res) => {
         {},
         "-sub -idUpload -refreals -regEvents -regWorkshop"
       ).lean();
+
+      const excludedEmails = new Set([
+        "n210059@rguktn.ac.in",
+        "n210615@rguktn.ac.in",
+        "n210323@rguktn.ac.in",
+        "n210797@rguktn.ac.in",
+        "n220788@rguktn.ac.in",
+        "n200447@rguktn.ac.in",
+        "n200086@rguktn.ac.in",
+        "n200430@rguktn.ac.in",
+        "n200414@rguktn.ac.in",
+        "n200366@rguktn.ac.in",
+        "n200081@rguktn.ac.in",
+        "n200734@rguktn.ac.in",
+        "n210413@rguktn.ac.in",
+      ]);
+
+      users = users.filter((user) => !excludedEmails.has(user.email));
+
       userCache.set("users", users);
     }
     return res.status(200).json({ users });
