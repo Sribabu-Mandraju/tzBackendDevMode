@@ -10,8 +10,7 @@ import {
   getTopReferrals,
   editUser,
   deleteUser,
-  userDeatilsonScan
-  
+  userDeatilsonScan,
 } from "../controllers/userControllers.js";
 import { addCredits } from "../controllers/userControllers.js";
 import { verifyUserToken } from "../middleware/auth.js";
@@ -22,11 +21,11 @@ const router = express.Router();
 router.post("/login", loginUser);
 router.post("/register", adminTokenCheck, registerUser);
 router.put("/edit/:id", adminTokenCheck, editUser);
-router.delete('/delete/:id',deleteUser)
+router.delete("/delete/:id", deleteUser);
 router.get("/getAll", adminTokenCheck, fetchUsers);
 router.get("/", verifyUserToken, fetchUser);
 router.get("/:id", adminTokenCheck, fetchUserById);
-router.put("/addcredits", addCredits)
+router.put("/addcredits", addCredits);
 
 router.post("/order/create", createOrder);
 router.post("/order/verify", paymentVerification);
@@ -34,6 +33,6 @@ router.post("/order/verify", paymentVerification);
 router.get("/refs/top", getTopReferrals);
 
 // Route to handle QR code scanning
-router.get('/user-info/:userId', userDeatilsonScan);
+router.get("/user-info/:userId", userDeatilsonScan);
 
 export default router;
