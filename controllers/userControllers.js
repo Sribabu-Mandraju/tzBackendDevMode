@@ -276,11 +276,8 @@ export const createOrder = async (req, res) => {
 
   let ramount = amount;
   if (domainPattern.test(email)) {
-    const offset = 1;
-    const studentId = email.substring(offset, offset + 6);
-
     ramount =
-      studentId.startsWith("n23") || studentId.startsWith("n24")
+      email.startsWith("n23") || email.startsWith("n24")
         ? Number(process.env.FEE_RGUKT_PUC)
         : Number(process.env.FEE_RGUKT);
   } else {
