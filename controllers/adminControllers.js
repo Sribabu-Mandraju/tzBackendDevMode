@@ -11,7 +11,7 @@ export const adminLogin = async (req, res) => {
     //   { "username": 1 },
     //   { "name": "username_1", "unique": true }
     // );
-    
+
     if (!user) {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
@@ -24,7 +24,7 @@ export const adminLogin = async (req, res) => {
     const token = jwt.sign(
       { adminId: user._id },
       process.env.JWT_ADMIN_SECRET,
-      { expiresIn: "12h" }
+      { expiresIn: "3d" }
     );
 
     return res.status(200).json({ user, token });
@@ -45,7 +45,7 @@ export const adminRegister = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-   
+
     const newUser = await Admin.create({
       username,
       role,
