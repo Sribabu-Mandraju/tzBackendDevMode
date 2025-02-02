@@ -119,7 +119,7 @@ export const registerUser = async (req, res) => {
     city,
     mode,
     referredBy,
-    razorpay_order_id
+    razorpay_order_id,
   } = req.body;
 
   try {
@@ -276,11 +276,11 @@ export const createOrder = async (req, res) => {
 
   let ramount = amount;
   if (domainPattern.test(email)) {
-    const offset = email.startsWith("ro") ? 2 : 1;
+    const offset = 2;
     const studentId = email.substring(offset, offset + 6);
 
     ramount =
-      studentId.startsWith("23") || studentId.startsWith("24")
+      studentId.startsWith("n23") || studentId.startsWith("n24")
         ? Number(process.env.FEE_RGUKT_PUC)
         : Number(process.env.FEE_RGUKT);
   } else {
