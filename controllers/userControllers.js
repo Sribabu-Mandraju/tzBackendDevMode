@@ -136,7 +136,6 @@ export const registerUser = async (req, res) => {
     if (mode !== "offline_mode" && !razorpay_order_id) {
       return res.status(400).json({ error: "Payment Check Error" });
     }
-    ;
     const sub = await bcrypt.hash(email, 12);
     const user = await User.create({
       email,
@@ -276,7 +275,7 @@ export const createOrder = async (req, res) => {
   } = req.body;
 
   const domainPattern =
-    /^(r|n|s|o|ro)[0-9]{6}@(rguktn|rguktong|rguktsklm|rguktrkv)\.ac\.in$/;
+    /^(r|n|s|rs|o|ro)[0-9]{6}@(rguktn|rguktong|rguktsklm|rguktrkv)\.ac\.in$/;
 
   const signUser = await SignUser.create({
     email,
