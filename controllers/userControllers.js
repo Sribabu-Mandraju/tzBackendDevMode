@@ -12,6 +12,7 @@ const userCache = new NodeCache({ stdTTL: 3600 });
 import { updateUserCredits } from "../helpers/credits.helpers.js";
 import { colleges } from "../constants/index.js";
 
+// Login
 export const loginUser = async (req, res) => {
   const { email, sub } = req.body;
 
