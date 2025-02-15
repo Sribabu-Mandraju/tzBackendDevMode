@@ -754,3 +754,29 @@ export const addCredits = async (req, res) => {
     });
   }
 };
+
+
+export const toggleIsDeletedAccount = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Ensure isDeleted exists and toggle it
+    user.isDeleted = user.isDeleted !== undefined ? !user.isDeleted : true;
+
+    await user.save();
+
+    return res.status(200).json({ 
+      message: `Account ${user.isDeleted ? "deleted" : "restored"} successfully`,
+      isDeleted: user.isDeleted 
+    });
+
+  } catch (error) {
+    console.error("Error toggling isDeleted status:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

@@ -11,6 +11,7 @@ import {
   editUser,
   deleteUser,
   userDeatilsonScan,
+  toggleIsDeletedAccount,
 } from "../controllers/userControllers.js";
 import { addCredits } from "../controllers/userControllers.js";
 import { verifyUserToken } from "../middleware/auth.js";
@@ -34,5 +35,7 @@ router.get("/refs/top", getTopReferrals);
 
 // Route to handle QR code scanning
 router.get("/user-info/:userId", userDeatilsonScan);
+
+router.put("/deleteAccount",verifyUserToken,toggleIsDeletedAccount);
 
 export default router;

@@ -4,6 +4,11 @@ const UserSchema = new mongoose.Schema(
   {
     tzkid: String,
     email: { type: String, required: true, unique: true },
+    isDeleted: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     college: String,
@@ -37,6 +42,7 @@ const UserSchema = new mongoose.Schema(
     mode: String,
     credits: { type: Number, default: 200 },
   },
+
   {
     timestamps: true,
   }
