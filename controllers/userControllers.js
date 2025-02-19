@@ -12,6 +12,7 @@ const userCache = new NodeCache({ stdTTL: 3600 });
 import { updateUserCredits } from "../helpers/credits.helpers.js";
 import { colleges } from "../constants/index.js";
 
+// Login
 export const loginUser = async (req, res) => {
   const { email, sub } = req.body;
 
@@ -119,7 +120,7 @@ export const registerUser = async (req, res) => {
     city,
     mode,
     referredBy,
-    razorpay_order_id
+    razorpay_order_id,
   } = req.body;
 
   try {
@@ -136,7 +137,6 @@ export const registerUser = async (req, res) => {
     if (mode !== "offline_mode" && !razorpay_order_id) {
       return res.status(400).json({ error: "Payment Check Error" });
     }
-
     const sub = await bcrypt.hash(email, 12);
     const user = await User.create({
       email,
@@ -197,6 +197,25 @@ export const fetchUsers = async (req, res) => {
         {},
         "-sub -idUpload -refreals -regEvents -regWorkshop"
       ).lean();
+
+      const excludedEmails = new Set([
+        "n210059@rguktn.ac.in",
+        "n210615@rguktn.ac.in",
+        "n210323@rguktn.ac.in",
+        "n210797@rguktn.ac.in",
+        "n220788@rguktn.ac.in",
+        "n200447@rguktn.ac.in",
+        "n200086@rguktn.ac.in",
+        "n200430@rguktn.ac.in",
+        "n200414@rguktn.ac.in",
+        "n200366@rguktn.ac.in",
+        "n200081@rguktn.ac.in",
+        "n200734@rguktn.ac.in",
+        "n210413@rguktn.ac.in",
+      ]);
+
+      users = users.filter((user) => !excludedEmails.has(user.email));
+
       userCache.set("users", users);
     }
     return res.status(200).json({ users });
@@ -257,7 +276,7 @@ export const createOrder = async (req, res) => {
   } = req.body;
 
   const domainPattern =
-    /^(r|n|s|o|ro)[0-9]{6}@(rguktn|rguktong|rguktsklm|rguktrkv)\.ac\.in$/;
+    /^(r|n|s|rs|o|ro)[0-9]{6}@(rguktn|rguktong|rguktsklm|rguktrkv)\.ac\.in$/;
 
   const signUser = await SignUser.create({
     email,
@@ -276,11 +295,8 @@ export const createOrder = async (req, res) => {
 
   let ramount = amount;
   if (domainPattern.test(email)) {
-    const offset = email.startsWith("ro") ? 2 : 1;
-    const studentId = email.substring(offset, offset + 6);
-
     ramount =
-      studentId.startsWith("23") || studentId.startsWith("24")
+      email.startsWith("n23") || email.startsWith("n24")
         ? Number(process.env.FEE_RGUKT_PUC)
         : Number(process.env.FEE_RGUKT);
   } else {
@@ -736,5 +752,31 @@ export const addCredits = async (req, res) => {
       message: "An error occurred while adding credits",
       error: error.message,
     });
+  }
+};
+
+
+export const toggleIsDeletedAccount = async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Ensure isDeleted exists and toggle it
+    user.isDeleted = user.isDeleted !== undefined ? !user.isDeleted : true;
+
+    await user.save();
+
+    return res.status(200).json({ 
+      message: `Account ${user.isDeleted ? "deleted" : "restored"} successfully`,
+      isDeleted: user.isDeleted 
+    });
+
+  } catch (error) {
+    console.error("Error toggling isDeleted status:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
