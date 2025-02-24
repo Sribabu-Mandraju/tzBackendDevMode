@@ -13,6 +13,7 @@ import adminTokenCheck from '../middleware/adminTokenCheck.js';
 const router = express.Router();
 
 router.post('/',verifyUserToken, createHackathon);
+
 router.post("/addByAdmin/",adminTokenCheck, createHackathonByAdmin);
 router.get('/', adminTokenCheck,getAllHackathons);
 router.put('/:id',adminTokenCheck, updateHackathon);

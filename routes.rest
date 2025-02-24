@@ -1,8 +1,45 @@
-POST http://localhost:4001/admin/register
+POST http://localhost:4001/hackathon
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzNjdiYmIyM2M2ZGZiNGVhMGU4ZjAiLCJpYXQiOjE3Mzg0ODQ5NjEsImV4cCI6MTczODU3MTM2MX0._ApKP9ro0DmreExhKmC2YCsfp_2PuUvGZkh9oUhXRMQ
+
+{
+  "teamMembers": [
+    {
+      "tzkid": "tzk250013",
+      "name": "Alice Johnson",
+      "phoneNumber": "9876543210"
+    },
+    {
+      "tzkid": "tzk250073",
+      "name": "Bob Smith",
+      "phoneNumber": "9876543211"
+    }
+  ],
+  "projectName": "AI-Based Crop Monitoring",
+  "abstract": "This project leverages AI and IoT sensors to monitor crop health in real-time, enhancing agricultural efficiency.",
+  "file": "https://example.com/uploads/project-file.pdf",
+  "problemStatementNumber": 3
+}
+
+###
+POST http://localhost:4001/hackathon/addByAdmin
 Content-Type: application/json
 
 {
-  "username": "",
-  "password": "Admin@123",
-  "role": "superadmin"
+  "teamMembers": [
+    {
+      "tzkid": "tzk250072",
+      "name": "Alice Johnson",
+      "phoneNumber": "9876543210"
+    },
+    {
+      "tzkid": "tzk250072",
+      "name": "Bob Smith",
+      "phoneNumber": "9876543211"
+    }
+  ],
+  "projectName": "AI-Based Crop Monitoring",
+  "abstract": "This project leverages AI and IoT sensors to monitor crop health in real-time, enhancing agricultural efficiency.",
+  "file": "https://example.com/uploads/project-file.pdf",
+  "problemStatementNumber": 3
 }

@@ -2,34 +2,255 @@ import Hackathon from "../models/hackathonModel.js";
 import User from "../models/userModel.js";
 
 // Create a new Hackathon entry
+// export const createHackathon = async (req, res) => {
+//   try {
+//     let {
+//       teamMembers,
+//       projectName,
+//       abstract,
+//       file,
+//       problemStatementNumber,
+//     } = req.body;
+
+//     if (
+//       !teamMembers ||
+//       !projectName ||
+//       !abstract ||
+//       !file ||
+//       !problemStatementNumber
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ message: "All required fields must be provided." });
+//     }
+
+//     const user = await User.findById(req.user);
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found." });
+//     }
+
+//     // Standardize teamMembers' data
+//     teamMembers = teamMembers.map((member) => ({
+//       tzkid: member.tzkid
+//         ? String(member.tzkid).replace(/\s+/g, "").toLowerCase()
+//         : undefined,
+//       name: member.name ? String(member.name).trim() : undefined,
+//       phoneNumber: member.phoneNumber
+//         ? String(member.phoneNumber).trim()
+//         : undefined,
+//       branch: member.branch ? String(member.branch).trim() : undefined,
+//     }));
+
+//     // Ensure team size constraints
+//     if (teamMembers.length < 1 || teamMembers.length > 4) {
+//       return res.status(400).json({
+//         message: "Team should have at least 2 and at most 5 members (4 + you).",
+//       });
+//     }
+
+//     // Add the requesting user as the 5th member
+//     const userTzkid = user.tzkid.replace(/\s+/g, "").toLowerCase();
+//     const userDetails = {
+//       tzkid: userTzkid,
+//       name: `${user.firstName} ${user.lastName}`.trim(),
+//       phoneNumber: user.phno.trim(),
+//     };
+//     teamMembers.push(userDetails); // Now total team size = 2 to 5
+
+//     // Check for duplicate tzkid in the teamMembers list
+//     const uniqueTzkids = new Set(teamMembers.map((member) => member.tzkid));
+//     if (uniqueTzkids.size !== teamMembers.length) {
+//       return res
+//         .status(400)
+//         .json({ message: "Duplicate tzkid found in team members." });
+//     }
+
+//     // Validate all tzkid exist in the User schema
+//     const allTzkids = [...uniqueTzkids];
+//     const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+
+//     if (usersFound.length !== allTzkids.length) {
+//       return res
+//         .status(400)
+//         .json({ message: "Some tzkid(s) do not exist in the database." });
+//     }
+
+//     // Check if any tzkid is already in another team in ProjectExpo
+//     const existingHackathon = await Hackathon.findOne({
+//       "teamMembers.tzkid": { $in: allTzkids },
+//     });
+
+//     if (existingHackathon) {
+//       return res.status(409).json({
+//         message:
+//           "One or more team members are already part of another project.",
+//       });
+//     }
+
+//     // Create the new project entry
+//     const hackathon = new Hackathon({
+//       teamMembers,
+//       projectName,
+//       abstract,
+//       file,
+//       problemStatementNumber,
+//     });
+//     await hackathon.save();
+
+//     res
+//       .status(201)
+//       .json({ message: "Hackathon entry created successfully!", hackathon });
+//   } catch (error) {
+//     console.error("Detailed Error:", error);
+//     res.status(500).json({
+//       message: "Error creating Hackathon entry",
+//       error: error.errors || error.message,
+//     });
+//   }
+// };
+
+// export const createHackathonByAdmin = async (req, res) => {
+//   console.log("called createHackathonByAdmin");
+//   try {
+//     let {
+//       teamMembers,
+//       projectName,
+//       abstract,
+//       file,
+//       problemStatementNumber,
+//     } = req.body;
+
+//     if (
+//       !teamMembers ||
+//       !projectName ||
+//       !abstract ||
+//       !file ||
+//       !problemStatementNumber
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ message: "All required fields must be provided." });
+//     }
+
+//     // Standardize teamMembers' data
+//     teamMembers = teamMembers.map((member) => ({
+//       tzkid: member.tzkid
+//         ? String(member.tzkid).replace(/\s+/g, "").toLowerCase()
+//         : undefined,
+//       name: member.name ? String(member.name).trim() : undefined,
+//       phoneNumber: member.phoneNumber
+//         ? String(member.phoneNumber).trim()
+//         : undefined,
+//       branch: member.branch ? String(member.branch).trim() : undefined,
+//     }));
+
+//     // Ensure team size constraints
+//     if (teamMembers.length < 2 || teamMembers.length > 5) {
+//       return res.status(400).json({
+//         message: "Team should have at least 2 and at most 5 members.",
+//       });
+//     }
+
+//     // Check for duplicate tzkid in the teamMembers list
+//     const uniqueTzkids = new Set(teamMembers.map((member) => member.tzkid));
+//     if (uniqueTzkids.size !== teamMembers.length) {
+//       return res
+//         .status(400)
+//         .json({ message: "Duplicate tzkid found in team members." });
+//     }
+
+//     // Validate all tzkid exist in the User schema
+//     const allTzkids = [...uniqueTzkids];
+//     const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+
+//     if (usersFound.length !== allTzkids.length) {
+//       return res
+//         .status(400)
+//         .json({ message: "Some tzkid(s) do not exist in the database." });
+//     }
+
+//     // Check if any tzkid is already in another team in ProjectExpo
+//     const existingHackathon = await Hackathon.findOne({
+//       "teamMembers.tzkid": { $in: allTzkids },
+//     });
+
+//     if (existingHackathon) {
+//       return res.status(409).json({
+//         message:
+//           "One or more team members are already part of another project.",
+//       });
+//     }
+
+//     // Create the new project entry
+//     const hackathon = new Hackathon({
+//       teamMembers,
+//       projectName,
+//       abstract,
+//       file,
+//       problemStatementNumber,
+//     });
+//     await hackathon.save();
+
+//     res
+//       .status(201)
+//       .json({ message: "Hackathon entry created successfully!", hackathon });
+//   } catch (error) {
+//     console.error("Detailed Error:", error);
+//     res.status(500).json({
+//       message: "Error creating Hackathon entry",
+//       error: error.errors || error.message,
+//     });
+//   }
+// };
+
+
 export const createHackathon = async (req, res) => {
   try {
-    let { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
+    let {
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    } = req.body;
 
-    if (!teamMembers || !projectName || !abstract || !file || !problemStatementNumber) {
-      return res.status(400).json({ message: "All required fields must be provided." });
+    if (
+      !teamMembers ||
+      !projectName ||
+      !abstract ||
+      !file ||
+      !problemStatementNumber
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided." });
     }
-   
+
     const user = await User.findById(req.user);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
     // Standardize teamMembers' data
-    teamMembers = teamMembers.map(member => ({
-      tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
+    teamMembers = teamMembers.map((member) => ({
+      tzkid: member.tzkid
+        ? String(member.tzkid).replace(/\s+/g, "").toLowerCase()
+        : undefined,
       name: member.name ? String(member.name).trim() : undefined,
-      phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
-      branch:member.branch ? String(member.branch).trim() : undefined,
+      phoneNumber: member.phoneNumber
+        ? String(member.phoneNumber).trim()
+        : undefined,
     }));
 
     // Ensure team size constraints
     if (teamMembers.length < 1 || teamMembers.length > 4) {
-      return res.status(400).json({ message: "Team should have at least 2 and at most 5 members (4 + you)." });
+      return res.status(400).json({
+        message: "Team should have at least 2 and at most 5 members (4 + you).",
+      });
     }
 
     // Add the requesting user as the 5th member
-    const userTzkid = user.tzkid.replace(/\s+/g, '').toLowerCase();
+    const userTzkid = user.tzkid.replace(/\s+/g, "").toLowerCase();
     const userDetails = {
       tzkid: userTzkid,
       name: `${user.firstName} ${user.lastName}`.trim(),
@@ -38,9 +259,11 @@ export const createHackathon = async (req, res) => {
     teamMembers.push(userDetails); // Now total team size = 2 to 5
 
     // Check for duplicate tzkid in the teamMembers list
-    const uniqueTzkids = new Set(teamMembers.map(member => member.tzkid));
+    const uniqueTzkids = new Set(teamMembers.map((member) => member.tzkid));
     if (uniqueTzkids.size !== teamMembers.length) {
-      return res.status(400).json({ message: "Duplicate tzkid found in team members." });
+      return res
+        .status(400)
+        .json({ message: "Duplicate tzkid found in team members." });
     }
 
     // Validate all tzkid exist in the User schema
@@ -48,80 +271,156 @@ export const createHackathon = async (req, res) => {
     const usersFound = await User.find({ tzkid: { $in: allTzkids } });
 
     if (usersFound.length !== allTzkids.length) {
-      return res.status(400).json({ message: "Some tzkid(s) do not exist in the database." });
+      return res
+        .status(400)
+        .json({ message: "Some tzkid(s) do not exist in the database." });
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
-    const existingHackathon = await Hackathon.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+    const checkAll = await Hackathon.findOne({
+      $and: [
+        { "teamMembers.tzkid": { $all: allTzkids } }, // All tzkids must exist
+        { $expr: { $eq: [{ $size: "$teamMembers" }, allTzkids.length] } }, // Ensure exact count match
+      ],
+    });
+    if (!checkAll) {
+      const existingProject = await Hackathon.findOne({
+        "teamMembers.tzkid": { $in: allTzkids },
+      });
 
-    if (existingHackathon) {
-      return res.status(409).json({ message: "One or more team members are already part of another project." });
+      if (existingProject) {
+        return res.status(409).json({
+          message:
+            "One or more team members are already part of another project.",
+        });
+      }
     }
 
     // Create the new project entry
-    const hackathon = new Hackathon({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    const hackathon = new Hackathon({
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    });
     await hackathon.save();
 
-    res.status(201).json({ message: "Hackathon entry created successfully!", hackathon });
-
+    res.status(201).json({
+      message: "hackathon entry created successfully!",
+      hackathon,
+    });
   } catch (error) {
     console.error("Detailed Error:", error);
-    res.status(500).json({ message: "Error creating Hackathon entry", error: error.errors || error.message });
+    res.status(500).json({
+      message: "Error creating ProjectExpo entry",
+      error: error.errors || error.message,
+    });
   }
 };
 
-export const createHackathonByAdmin = async (req, res) => {
-  console.log("called createHackathonByAdmin");
-  try {
-    let { teamMembers, projectName, abstract, file, problemStatementNumber } = req.body;
 
-    if (!teamMembers || !projectName || !abstract || !file || !problemStatementNumber) {
-      return res.status(400).json({ message: "All required fields must be provided." });
+export const createHackathonByAdmin = async (req, res) => {
+  try {
+    let {
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    } = req.body;
+
+    if (
+      !teamMembers ||
+      !projectName ||
+      !abstract ||
+      !file ||
+      !problemStatementNumber
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided." });
     }
 
     // Standardize teamMembers' data
-    teamMembers = teamMembers.map(member => ({
-      tzkid: member.tzkid ? String(member.tzkid).replace(/\s+/g, '').toLowerCase() : undefined, 
+    teamMembers = teamMembers.map((member) => ({
+      tzkid: member.tzkid
+        ? String(member.tzkid).replace(/\s+/g, "").toLowerCase()
+        : undefined,
       name: member.name ? String(member.name).trim() : undefined,
-      phoneNumber: member.phoneNumber ? String(member.phoneNumber).trim() : undefined,
-      branch:member.branch ? String(member.branch).trim() : undefined,
+      phoneNumber: member.phoneNumber
+        ? String(member.phoneNumber).trim()
+        : undefined,
     }));
 
     // Ensure team size constraints
     if (teamMembers.length < 2 || teamMembers.length > 5) {
-      return res.status(400).json({ message: "Team should have at least 2 and at most 5 members." });
+      return res.status(400).json({
+        message: "Team should have at least 2 and at most 5 members.",
+      });
     }
 
     // Check for duplicate tzkid in the teamMembers list
-    const uniqueTzkids = new Set(teamMembers.map(member => member.tzkid));
+    const uniqueTzkids = new Set(teamMembers.map((member) => member.tzkid));
     if (uniqueTzkids.size !== teamMembers.length) {
-      return res.status(400).json({ message: "Duplicate tzkid found in team members." });
+      return res
+        .status(400)
+        .json({ message: "Duplicate tzkid found in team members." });
     }
 
     // Validate all tzkid exist in the User schema
     const allTzkids = [...uniqueTzkids];
-    const usersFound = await User.find({ tzkid: { $in: allTzkids } });
+    const usersFound = await User.find({
+      tzkid: { $in: allTzkids },
+    });
 
     if (usersFound.length !== allTzkids.length) {
-      return res.status(400).json({ message: "Some tzkid(s) do not exist in the database." });
+      return res
+        .status(400)
+        .json({ message: "Some tzkid(s) do not exist in the database." });
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
-    const existingHackathon = await Hackathon.findOne({ "teamMembers.tzkid": { $in: allTzkids } });
+    const checkAll = await Hackathon.findOne({
+      $and: [
+        { "teamMembers.tzkid": { $all: allTzkids } },
+        { $expr: { $eq: [{ $size: "$teamMembers" }, allTzkids.length] } },
+      ],
+    });
 
-    if (existingHackathon) {
-      return res.status(409).json({ message: "One or more team members are already part of another project." });
+    if (!checkAll) {
+      const existingProject = await Hackathon.findOne({
+        "teamMembers.tzkid": { $in: allTzkids },
+      });
+
+      if (existingProject) {
+        return res.status(409).json({
+          message:
+            "One or more team members are already part of another project.",
+        });
+      }
     }
 
     // Create the new project entry
-    const hackathon = new Hackathon({ teamMembers, projectName, abstract, file, problemStatementNumber });
+    const hackathon = new Hackathon({
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    });
     await hackathon.save();
 
-    res.status(201).json({ message: "Hackathon entry created successfully!", hackathon });
-
+    res.status(201).json({
+      message: "Hackathon entry created successfully!",
+      hackathon,
+    });
   } catch (error) {
     console.error("Detailed Error:", error);
-    res.status(500).json({ message: "Error creating Hackathon entry", error: error.errors || error.message });
+    res.status(500).json({
+      message: "Error creating ProjectExpo entry",
+      error: error.errors || error.message,
+    });
   }
 };
 
@@ -131,7 +430,9 @@ export const getAllHackathons = async (req, res) => {
     const hackathons = await Hackathon.find();
     res.status(200).json(hackathons);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching Hackathon entries", error });
+    res
+      .status(500)
+      .json({ message: "Error fetching Hackathon entries", error });
   }
 };
 
@@ -157,13 +458,17 @@ export const updateHackathon = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    const hackathon = await Hackathon.findByIdAndUpdate(id, updates, { new: true });
+    const hackathon = await Hackathon.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
 
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon entry not found." });
     }
 
-    res.status(200).json({ message: "Hackathon entry updated successfully!", hackathon });
+    res
+      .status(200)
+      .json({ message: "Hackathon entry updated successfully!", hackathon });
   } catch (error) {
     res.status(500).json({ message: "Error updating Hackathon entry", error });
   }
@@ -200,7 +505,9 @@ export const addTeamMember = async (req, res) => {
     hackathon.teamMembers.push(teamMember);
     await hackathon.save();
 
-    res.status(200).json({ message: "Team member added successfully!", hackathon });
+    res
+      .status(200)
+      .json({ message: "Team member added successfully!", hackathon });
   } catch (error) {
     res.status(500).json({ message: "Error adding team member", error });
   }
@@ -217,10 +524,14 @@ export const removeTeamMember = async (req, res) => {
       return res.status(404).json({ message: "Hackathon entry not found." });
     }
 
-    hackathon.teamMembers = hackathon.teamMembers.filter((member) => member.tzkid !== tzkid);
+    hackathon.teamMembers = hackathon.teamMembers.filter(
+      (member) => member.tzkid !== tzkid
+    );
     await hackathon.save();
 
-    res.status(200).json({ message: "Team member removed successfully!", hackathon });
+    res
+      .status(200)
+      .json({ message: "Team member removed successfully!", hackathon });
   } catch (error) {
     res.status(500).json({ message: "Error removing team member", error });
   }

@@ -3,8 +3,13 @@ import User from "../models/userModel.js";
 
 export const createProjectExpo = async (req, res) => {
   try {
-    let { teamMembers, projectName, abstract, file, problemStatementNumber } =
-      req.body;
+    let {
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    } = req.body;
 
     if (
       !teamMembers ||
@@ -113,8 +118,13 @@ export const createProjectExpo = async (req, res) => {
 
 export const createProjectExpoByAdmin = async (req, res) => {
   try {
-    let { teamMembers, projectName, abstract, file, problemStatementNumber } =
-      req.body;
+    let {
+      teamMembers,
+      projectName,
+      abstract,
+      file,
+      problemStatementNumber,
+    } = req.body;
 
     if (
       !teamMembers ||
