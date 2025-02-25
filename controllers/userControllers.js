@@ -212,6 +212,7 @@ export const fetchUsers = async (req, res) => {
         "n200081@rguktn.ac.in",
         "n200734@rguktn.ac.in",
         "n210413@rguktn.ac.in",
+        "n200166@rguktn.ac.in",
       ]);
 
       users = users.filter((user) => !excludedEmails.has(user.email));
