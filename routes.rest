@@ -1,6 +1,6 @@
 POST http://localhost:4001/hackathon
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzNjdiYmIyM2M2ZGZiNGVhMGU4ZjAiLCJpYXQiOjE3Mzg0ODQ5NjEsImV4cCI6MTczODU3MTM2MX0._ApKP9ro0DmreExhKmC2YCsfp_2PuUvGZkh9oUhXRMQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzODEzNDhmZjcwMTA0ZjM1NmU2ODAiLCJpYXQiOjE3NDA0Njk3MzEsImV4cCI6MTc0MDU1NjEzMX0.2-cI7JwQsCh9qKhoc7a17FyaaFcE3CEemDcFHAEUdMA
 
 {
   "teamMembers": [
@@ -15,9 +15,9 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzN
       "phoneNumber": "9876543211"
     }
   ],
-  "projectName": "AI-Based Crop Monitoring",
-  "abstract": "This project leverages AI and IoT sensors to monitor crop health in real-time, enhancing agricultural efficiency.",
-  "file": "https://example.com/uploads/project-file.pdf",
+  "projectName": "RoboTHOn",
+  "abstract": "RoboTHOn",
+  "file": "RoboTHOn.pdf",
   "problemStatementNumber": 3
 }
 
