@@ -8,7 +8,7 @@ const teamMemberSchema = new mongoose.Schema({
   },
   name: {
     type: String, // Name of the team member
-    required: true,
+    // required: true,
   },
   phoneNumber: {
     type: String, // Phone number of the team member
@@ -53,3 +53,4 @@ function arrayLimit(val) {
 const Hackathon = mongoose.model('Hackathon', hackathonSchema);
 
 export default Hackathon;
+
