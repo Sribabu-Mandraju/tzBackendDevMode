@@ -203,7 +203,6 @@ import User from "../models/userModel.js";
 //   }
 // };
 
-
 export const createHackathon = async (req, res) => {
   try {
     let {
@@ -266,14 +265,44 @@ export const createHackathon = async (req, res) => {
         .json({ message: "Duplicate tzkid found in team members." });
     }
 
-    // Validate all tzkid exist in the User schema
+    // Get detailed user information for all team members
     const allTzkids = [...uniqueTzkids];
     const usersFound = await User.find({ tzkid: { $in: allTzkids } });
 
     if (usersFound.length !== allTzkids.length) {
-      return res
-        .status(400)
-        .json({ message: "Some tzkid(s) do not exist in the database." });
+      return res.status(400).json({
+        message: "Some tzkid(s) do not exist in the database.",
+      });
+    }
+
+    // Check if projectName, abstract and file match "robothon"
+    if (
+      projectName?.toLowerCase() === "robothon" &&
+      abstract?.toLowerCase() === "robothon" &&
+      file?.toLowerCase() === "robothon"
+    ) {
+      // Count E4 and E3 students
+      const e4Students = usersFound.filter((user) => user.year === "E4");
+      const e3Students = usersFound.filter((user) => user.year === "E3");
+
+      // Validation rules for E4 and E3 students
+      if (e4Students.length > 0) {
+        // If E4 student present, only one E3 allowed
+        if (e3Students.length > 1) {
+          return res.status(400).json({
+            message:
+              "When a 4th year student is present, only one 3rd year student is allowed in the team",
+          });
+        }
+      } else {
+        // If no E4 student, maximum two E3 students allowed
+        if (e3Students.length > 2) {
+          return res.status(400).json({
+            message:
+              "Without 4th year students, maximum two 3rd year students are allowed in the team",
+          });
+        }
+      }
     }
 
     // Check if any tzkid is already in another team in ProjectExpo
@@ -318,7 +347,6 @@ export const createHackathon = async (req, res) => {
     });
   }
 };
-
 
 export const createHackathonByAdmin = async (req, res) => {
   try {
@@ -370,9 +398,7 @@ export const createHackathonByAdmin = async (req, res) => {
 
     // Validate all tzkid exist in the User schema
     const allTzkids = [...uniqueTzkids];
-    const usersFound = await User.find({
-      tzkid: { $in: allTzkids },
-    });
+    const usersFound = await User.find({ tzkid: { $in: allTzkids } });
 
     if (usersFound.length !== allTzkids.length) {
       return res
@@ -380,7 +406,37 @@ export const createHackathonByAdmin = async (req, res) => {
         .json({ message: "Some tzkid(s) do not exist in the database." });
     }
 
-    // Check if any tzkid is already in another team in ProjectExpo
+    // Check robothon rules if applicable
+    if (
+      projectName?.toLowerCase() === "robothon" &&
+      abstract?.toLowerCase() === "robothon" &&
+      file?.toLowerCase() === "robothon"
+    ) {
+      // Count E4 and E3 students
+      const e4Students = usersFound.filter((user) => user.year === "E4");
+      const e3Students = usersFound.filter((user) => user.year === "E3");
+
+      // Validation rules for E4 and E3 students
+      if (e4Students.length > 0) {
+        // If E4 student present, only one E3 allowed
+        if (e3Students.length > 1) {
+          return res.status(400).json({
+            message:
+              "When a 4th year student is present, only one 3rd year student is allowed in the team",
+          });
+        }
+      } else {
+        // If no E4 student, maximum two E3 students allowed
+        if (e3Students.length > 2) {
+          return res.status(400).json({
+            message:
+              "Without 4th year students, maximum two 3rd year students are allowed in the team",
+          });
+        }
+      }
+    }
+
+    // Check if team already exists
     const checkAll = await Hackathon.findOne({
       $and: [
         { "teamMembers.tzkid": { $all: allTzkids } },
@@ -418,7 +474,7 @@ export const createHackathonByAdmin = async (req, res) => {
   } catch (error) {
     console.error("Detailed Error:", error);
     res.status(500).json({
-      message: "Error creating ProjectExpo entry",
+      message: "Error creating Hackathon entry",
       error: error.errors || error.message,
     });
   }
