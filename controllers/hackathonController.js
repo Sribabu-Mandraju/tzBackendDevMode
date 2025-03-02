@@ -286,7 +286,13 @@ export const createHackathon = async (req, res) => {
       const e3Students = usersFound.filter((user) => user.year === "E3");
 
       // Validation rules for E4 and E3 students
-      if (e4Students.length > 0) {
+      if (e4Students.length > 1) {
+        return res.status(400).json({
+          message: "Only one 4th year student is allowed in the team",
+        });
+      }
+
+      if (e4Students.length === 1) {
         // If E4 student present, only one E3 allowed
         if (e3Students.length > 1) {
           return res.status(400).json({
@@ -417,7 +423,13 @@ export const createHackathonByAdmin = async (req, res) => {
       const e3Students = usersFound.filter((user) => user.year === "E3");
 
       // Validation rules for E4 and E3 students
-      if (e4Students.length > 0) {
+      if (e4Students.length > 1) {
+        return res.status(400).json({
+          message: "Only one 4th year student is allowed in the team",
+        });
+      }
+
+      if (e4Students.length === 1) {
         // If E4 student present, only one E3 allowed
         if (e3Students.length > 1) {
           return res.status(400).json({

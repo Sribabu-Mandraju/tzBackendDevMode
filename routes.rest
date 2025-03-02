@@ -1,24 +1,25 @@
 POST http://localhost:4001/hackathon
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzODEzNDhmZjcwMTA0ZjM1NmU2ODAiLCJpYXQiOjE3NDA0Njk3MzEsImV4cCI6MTc0MDU1NjEzMX0.2-cI7JwQsCh9qKhoc7a17FyaaFcE3CEemDcFHAEUdMA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2MyOWY2MzlmOGEwYWQ2NWM4ZTk3MWIiLCJpYXQiOjE3NDA5MDk0ODMsImV4cCI6MTc0MDk5NTg4M30.Tc919_Vb5wxY8roFSH7GGgi1TXuhJxy0Rbl6vhyy_n4  
 
 {
   "teamMembers": [
     {
-      "tzkid": "tzk250013",
-      "name": "Alice Johnson",
-      "phoneNumber": "9876543210"
+      "tzkid": "tzk250027",
+      "name": "Nayak ",
+      "phoneNumber": "7337273492"
     },
     {
-      "tzkid": "tzk250073",
-      "name": "Bob Smith",
-      "phoneNumber": "9876543211"
+      "tzkid": "tzk250019",
+      "name": "Pallapu Siva Santosh",
+      "phoneNumber": "9059470520"
     }
+    
   ],
-  "projectName": "RoboTHOn",
-  "abstract": "RoboTHOn",
-  "file": "RoboTHOn.pdf",
-  "problemStatementNumber": 3
+  "projectName": "Robothon",
+  "abstract": "Robothon",
+  "file": "Robothon",
+  "problemStatementNumber": 1
 }
 
 ###
