@@ -138,9 +138,12 @@ export const deleteEvent = async (req, res) => {
 
 export const eventRegistration = async (req, res) => {
   const eventId = req.params.id;
-  const { tzkIds } = req.body;
+  let { tzkIds } = req.body;
 
   try {
+    // Convert all tzkIds to lowercase
+    tzkIds = tzkIds.map((id) => String(id).replace(/\s+/g, "").toLowerCase());
+
     const existingUsers = await User.find({ tzkid: { $in: tzkIds } });
     if (existingUsers.length !== tzkIds.length) {
       return res.status(404).json({ message: `Invalid Teckzite Ids` });
